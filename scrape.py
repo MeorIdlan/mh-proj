@@ -1,4 +1,4 @@
-from playwright.sync_api import sync_playwright, TimeoutError
+from playwright.sync_api import sync_playwright, TimeoutError, expect
 import redis
 import json
 
@@ -10,8 +10,8 @@ class cacheSetError(Exception):
 
 class Scraper:
     def __init__(self):
-        self.cache = redis.Redis(host='localhost', port=6379)
-        self.ttl = 1800     # cache ttl at 30 minutes
+        self.cache = redis.Redis(host='localhost', port=6379, db=0)
+        self.ttl = 300     # cache ttl at 30 minutes (1800), 5 mins for debug (300)
         
     def scrape_subway_site(self, query=None):
         with sync_playwright() as p:
@@ -49,10 +49,15 @@ class Scraper:
                         pass
                     
                     if not errFound:
-                        all_locations = page.locator(".fp_listitem").all()
-                        for loc in all_locations:
-                            if loc.get_attribute('style') is not None and loc.get_attribute('style').find('display: none;') == -1:
-                                all_locations_list.append((float(loc.get_attribute('data-latitude')),float(loc.get_attribute('data-longitude'))))
+                        all_locations = page.locator('.fp_listitem').all()
+                        
+                        def checkCSS(loc):
+                            try:
+                                expect(loc).not_to_have_css('display','none',timeout=5)
+                                return True
+                            except AssertionError:
+                                return False
+                        all_locations_list = [(float(loc.get_attribute('data-latitude')),float(loc.get_attribute('data-longitude'))) for loc in all_locations if checkCSS(loc)]
                     else:
                         return -2
             except TimeoutError as e:
@@ -66,6 +71,7 @@ class Scraper:
                 self.cache.set(f"{query.replace(' ','').lower()}", json.dumps(all_locations_list), ex=self.ttl)
             return 1
             
+    # todo get restaurant details
     def getLocations(self, query=None):
         # check search query in cache
         if query is None:
@@ -90,7 +96,8 @@ class Scraper:
             else:
                 return json.loads(self.cache.get(f"{query.replace(' ','').lower()}"))
     
-# if __name__ == '__main__':
-#     scraper = Scraper()
-#     # scraper.getLocations()
-#     print(scraper.getLocations('perak'))
+if __name__ == '__main__':
+    scraper = Scraper()
+    # scraper.getLocations()
+    print(scraper.getLocations('penang'))
+    print(len(scraper.getLocations('penang')))

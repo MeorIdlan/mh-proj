@@ -11,7 +11,7 @@ class cacheSetError(Exception):
 class Scraper:
     def __init__(self):
         self.cache = redis.Redis(host='localhost', port=6379, db=0)
-        self.ttl = 300     # cache ttl at 30 minutes (1800), 5 mins for debug (300)
+        self.ttl = 60     # cache ttl at 30 minutes (1800), 1 min for debug (60)
         
     def scrape_subway_site(self, query=None):
         with sync_playwright() as p:
@@ -29,7 +29,21 @@ class Scraper:
                 # get all locations and extract latitude longitude in a list
                 if (query is None):
                     all_locations = page.locator('.fp_listitem').all()
-                    all_locations_list = [(float(loc.get_attribute('data-latitude')),float(loc.get_attribute('data-longitude'))) for loc in all_locations]
+                    all_locations_list = [
+                        (
+                            float(loc.get_attribute('data-latitude')),  # latitude
+                            float(loc.get_attribute('data-longitude')), # longitude
+                            loc.locator('.location_left h4').inner_text(),  # outlet name
+                            loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(),    # outlet address
+                            (
+                                loc.locator('.location_left .infoboxcontent p').nth(2).inner_text(),   # outlet standard operating hours
+                                loc.locator('.location_left .infoboxcontent p').nth(3).inner_text() if len(loc.locator('.location_left .infoboxcontent p').nth(3).inner_text())>0 else '' # outlet special operating hours (if any)
+                            ),
+                            loc.locator('.location_right .directionButton a').nth(0).get_attribute('href'), # google map link
+                            loc.locator('.location_right .directionButton a').nth(1).get_attribute('href') # waze link
+                        )
+                        for loc in all_locations
+                    ]
                 else:
                     # setup error dialog handling
                     errFound = False
@@ -57,7 +71,21 @@ class Scraper:
                                 return True
                             except AssertionError:
                                 return False
-                        all_locations_list = [(float(loc.get_attribute('data-latitude')),float(loc.get_attribute('data-longitude'))) for loc in all_locations if checkCSS(loc)]
+                        all_locations_list = [
+                            (
+                                float(loc.get_attribute('data-latitude')),  # latitude
+                                float(loc.get_attribute('data-longitude')), # longitude
+                                loc.locator('.location_left h4').inner_text(),  # outlet name
+                                loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(),    # outlet address
+                                (
+                                    loc.locator('.location_left .infoboxcontent p').nth(2).inner_text(),   # outlet standard operating hours
+                                    loc.locator('.location_left .infoboxcontent p').nth(3).inner_text() if len(loc.locator('.location_left .infoboxcontent p').nth(3).inner_text())>0 else '' # outlet special operating hours (if any)
+                                ),
+                                loc.locator('.location_right .directionButton a').nth(0).get_attribute('href'), # google map link
+                                loc.locator('.location_right .directionButton a').nth(1).get_attribute('href') # waze link
+                            )
+                            for loc in all_locations if checkCSS(loc)
+                        ]
                     else:
                         return -2
             except TimeoutError as e:
@@ -99,5 +127,7 @@ class Scraper:
 if __name__ == '__main__':
     scraper = Scraper()
     # scraper.getLocations()
-    print(scraper.getLocations('penang'))
-    print(len(scraper.getLocations('penang')))
+    try:
+        print(scraper.getLocations('perlis'))
+    except TimeoutError:
+        pass

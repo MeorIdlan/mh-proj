@@ -9,5 +9,11 @@ def get_subway_locations():
     scraper = scrape.Scraper()
     return jsonify({'locations':scraper.getLocations(query=query)})
 
+@app.route('/dev-api/subway-locations', methods=['GET'])
+def dev_get_subway_locations():
+    query = request.args.get('query', default=None, type=str)
+    scraper = scrape.Scraper('dev')
+    return jsonify({'locations':scraper.getLocations(query=query)})
+
 if __name__ == '__main__':
     app.run(debug=True)

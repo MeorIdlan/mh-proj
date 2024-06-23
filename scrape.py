@@ -9,9 +9,14 @@ class cacheSetError(Exception):
         super().__init__(self.message)
 
 class Scraper:
-    def __init__(self):
-        self.cache = redis.Redis(host='localhost', port=6379, db=0)
-        self.ttl = 60     # cache ttl at 30 minutes (1800), 1 min for debug (60)
+    def __init__(self, mode='live'):
+        # dev or live
+        if mode == 'dev':
+            self.ttl = 60
+            self.cache = redis.Redis(host='localhost', port=6379, db=0)
+        else:
+            self.ttl = 1800
+            self.cache = redis.Redis(host='localhost', port=6379, db=1)
         
     def scrape_subway_site(self, query=None):
         with sync_playwright() as p:
@@ -116,7 +121,7 @@ class Scraper:
                     raise cacheSetError(code=result)
             except cacheSetError as e:
                 print(f'Error code: {e.code}')
-                return None
+                return f'Error code: {e.code}'
                 
             if query is None:
                 return json.loads(self.cache.get('all'))
@@ -124,8 +129,7 @@ class Scraper:
                 return json.loads(self.cache.get(f"{query.replace(' ','').lower()}"))
     
 if __name__ == '__main__':
-    scraper = Scraper()
-    # scraper.getLocations()
+    scraper = Scraper('dev')
     try:
         print(scraper.getLocations('penang'))
     except TimeoutError:

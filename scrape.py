@@ -99,7 +99,6 @@ class Scraper:
                 self.cache.set(f"{query.replace(' ','').lower()}", json.dumps(all_locations_list), ex=self.ttl)
             return 1
             
-    # todo get restaurant details
     def getLocations(self, query=None):
         # check search query in cache
         if query is None:

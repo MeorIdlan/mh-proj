@@ -1,7 +1,7 @@
-MindHive Assessment Project
-This project is web application that allows user to search for a Subway restaurant in Malaysia.
-The project is divided into two parts: the frontend and the API. 
-The API or the backend is responsible for scraping data from the official Malaysia Subway website and allowing the frontend to request for restaurant locations based on user's queries.
+MindHive Assessment Project<br>
+This project is web application that allows user to search for a Subway restaurant in Malaysia.<br>
+The project is divided into two parts: the frontend and the API.<br>
+The API or the backend is responsible for scraping data from the official Malaysia Subway website and allowing the frontend to request for restaurant locations based on user's queries.<br>
 The frontend will allow the user to see each restaurants on a map.
 
 Instructions on running backend:
@@ -13,4 +13,3 @@ Instructions on running backend:
 TODO
 1) frontend
 2) better readme
-3) get restaurant details in backend

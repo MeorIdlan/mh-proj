@@ -30,18 +30,18 @@ class Scraper:
                 if (query is None):
                     all_locations = page.locator('.fp_listitem').all()
                     all_locations_list = [
-                        (
-                            float(loc.get_attribute('data-latitude')),  # latitude
-                            float(loc.get_attribute('data-longitude')), # longitude
-                            loc.locator('.location_left h4').inner_text(),  # outlet name
-                            loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(),    # outlet address
-                            (
-                                loc.locator('.location_left .infoboxcontent p').nth(2).inner_text(),   # outlet standard operating hours
-                                loc.locator('.location_left .infoboxcontent p').nth(3).inner_text() if len(loc.locator('.location_left .infoboxcontent p').nth(3).inner_text())>0 else '' # outlet special operating hours (if any)
-                            ),
-                            loc.locator('.location_right .directionButton a').nth(0).get_attribute('href'), # google map link
-                            loc.locator('.location_right .directionButton a').nth(1).get_attribute('href') # waze link
-                        )
+                        {
+                            'lat': float(loc.get_attribute('data-latitude')),  # latitude
+                            'long': float(loc.get_attribute('data-longitude')), # longitude
+                            'name': loc.locator('.location_left h4').inner_text(),  # outlet name
+                            'address': loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(),    # outlet address
+                            'times': {
+                                'standard': loc.locator('.location_left .infoboxcontent p').nth(2).inner_text() if loc.locator('.location_left .infoboxcontent p').count()>2 else '',   # outlet standard operating hours
+                                'special': loc.locator('.location_left .infoboxcontent p').nth(3).inner_text() if loc.locator('.location_left .infoboxcontent p').count()>5 else '' # outlet special operating hours (if any)
+                            },
+                            'google': loc.locator('.location_right .directionButton a').nth(0).get_attribute('href'), # google map link
+                            'waze': loc.locator('.location_right .directionButton a').nth(1).get_attribute('href') # waze link
+                        }
                         for loc in all_locations
                     ]
                 else:
@@ -72,18 +72,18 @@ class Scraper:
                             except AssertionError:
                                 return False
                         all_locations_list = [
-                            (
-                                float(loc.get_attribute('data-latitude')),  # latitude
-                                float(loc.get_attribute('data-longitude')), # longitude
-                                loc.locator('.location_left h4').inner_text(),  # outlet name
-                                loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(),    # outlet address
-                                (
-                                    loc.locator('.location_left .infoboxcontent p').nth(2).inner_text(),   # outlet standard operating hours
-                                    loc.locator('.location_left .infoboxcontent p').nth(3).inner_text() if len(loc.locator('.location_left .infoboxcontent p').nth(3).inner_text())>0 else '' # outlet special operating hours (if any)
-                                ),
-                                loc.locator('.location_right .directionButton a').nth(0).get_attribute('href'), # google map link
-                                loc.locator('.location_right .directionButton a').nth(1).get_attribute('href') # waze link
-                            )
+                            {
+                                'lat': float(loc.get_attribute('data-latitude')),  # latitude
+                                'long': float(loc.get_attribute('data-longitude')), # longitude
+                                'name': loc.locator('.location_left h4').inner_text(),  # outlet name
+                                'address': loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(),    # outlet address
+                                'times': {
+                                    'standard': loc.locator('.location_left .infoboxcontent p').nth(2).inner_text() if loc.locator('.location_left .infoboxcontent p').count()>2 else '',   # outlet standard operating hours
+                                    'special': loc.locator('.location_left .infoboxcontent p').nth(3).inner_text() if loc.locator('.location_left .infoboxcontent p').count()>5 else '' # outlet special operating hours (if any)
+                                },
+                                'google': loc.locator('.location_right .directionButton a').nth(0).get_attribute('href'), # google map link
+                                'waze': loc.locator('.location_right .directionButton a').nth(1).get_attribute('href') # waze link
+                            }
                             for loc in all_locations if checkCSS(loc)
                         ]
                     else:
@@ -128,6 +128,6 @@ if __name__ == '__main__':
     scraper = Scraper()
     # scraper.getLocations()
     try:
-        print(scraper.getLocations('perlis'))
+        print(scraper.getLocations('penang'))
     except TimeoutError:
         pass

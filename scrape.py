@@ -5,7 +5,11 @@ import json
 class cacheSetError(Exception):
     def __init__(self, code, message='Something went wrong when setting new cache data.') -> None:
         self.code = code
-        self.message = message
+        messageAll = [
+            'Location search returned with an error.\n', # code -2
+            'TimeoutError occurred somewhere during scraping.\n' # code -1
+        ]
+        self.message = messageAll[self.code]+message
         super().__init__(self.message)
 
 class Scraper:
@@ -92,17 +96,16 @@ class Scraper:
                             for loc in all_locations if checkCSS(loc)
                         ]
                     else:
-                        return -2
+                        return (-2, f'Search yielded zero results: {errFound}')
             except TimeoutError as e:
-                print(f'Timeout error: {e}')
-                return -1
+                return (-1, f'Timeout error: {e}')
             
             # set cache
             if (query is None):
                 self.cache.set('all', json.dumps(all_locations_list), ex=self.ttl)
             else:
                 self.cache.set(f"{query.replace(' ','').lower()}", json.dumps(all_locations_list), ex=self.ttl)
-            return 1
+            return (1, '')
             
     def getLocations(self, query=None):
         # check search query in cache
@@ -117,11 +120,11 @@ class Scraper:
         else:
             try:
                 result = self.scrape_subway_site(query=query)
-                if result < 0:
-                    raise cacheSetError(code=result)
+                if result[0] < 0:
+                    raise cacheSetError(code=result[0],message=result[1])
             except cacheSetError as e:
-                print(f'Error code: {e.code}')
-                return f'Error code: {e.code}'
+                print(f'Error message:\n{e.message}\nError code: {e.code}')
+                return f'Error message:\n{e.message}\nError code: {e.code}'
                 
             if query is None:
                 return json.loads(self.cache.get('all'))

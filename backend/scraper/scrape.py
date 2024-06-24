@@ -40,8 +40,10 @@ class Scraper:
                     all_locations = page.locator('.fp_listitem').all()
                     all_locations_list = [
                         {
-                            'lat': float(loc.get_attribute('data-latitude')),  # latitude
-                            'long': float(loc.get_attribute('data-longitude')), # longitude
+                            'pos': {
+                                'lat': float(loc.get_attribute('data-latitude')),  # latitude
+                                'lng': float(loc.get_attribute('data-longitude')), # longitude
+                            },
                             'name': loc.locator('.location_left h4').inner_text(),  # outlet name
                             'address': loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(),    # outlet address
                             'times': {
@@ -82,8 +84,10 @@ class Scraper:
                                 return False
                         all_locations_list = [
                             {
-                                'lat': float(loc.get_attribute('data-latitude')),  # latitude
-                                'long': float(loc.get_attribute('data-longitude')), # longitude
+                                'pos': {
+                                    'lat': float(loc.get_attribute('data-latitude')),  # latitude
+                                    'lng': float(loc.get_attribute('data-longitude')), # longitude
+                                },
                                 'name': loc.locator('.location_left h4').inner_text(),  # outlet name
                                 'address': loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(),    # outlet address
                                 'times': {

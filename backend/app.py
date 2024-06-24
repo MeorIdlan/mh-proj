@@ -13,7 +13,9 @@ def get_subway_locations():
 def dev_get_subway_locations():
     query = request.args.get('query', default=None, type=str)
     scraper = scrape.Scraper('dev')
-    return jsonify({'locations':scraper.getLocations(query=query)})
+    response = jsonify({'locations': scraper.getLocations(query=query)})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -128,7 +128,7 @@ class Scraper:
                     raise cacheSetError(code=result[0],message=result[1])
             except cacheSetError as e:
                 print(f'Error message:\n{e.message}\nError code: {e.code}')
-                return f'Error message:\n{e.message}\nError code: {e.code}'
+                return {'message': e.message, 'code': e.code}
                 
             if query is None:
                 return json.loads(self.cache.get('all'))

@@ -30,6 +30,7 @@ const App: React.FC = () => {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
+        // TODO check if locations key exists
         setLocations(data.locations);
         setLoading(false);
       } catch (error) {

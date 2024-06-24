@@ -10,6 +10,11 @@ Instructions on running backend:
 3) Run redis server (requires WSL if on windows, https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/)
 4) Run command "python app.py" in directory (default port 5000)
 
+Instructions on running frontend:
+1) Install nodejs and npm (LTS)
+2) Run npm install in /frontend/mh-webapp/ directory
+3) Run npm start in same directory
+
 TODO
-1) frontend
+1) frontend (query box)
 2) better readme

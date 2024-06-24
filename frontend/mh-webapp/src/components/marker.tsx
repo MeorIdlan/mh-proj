@@ -100,7 +100,7 @@ function MarkerWithInfoWindow({loc,highlight,highlighted,setHighlightedLocations
   return (
     <>
       <AdvancedMarker position={loc.pos} ref={markerRef} onClick={handleMarkerClick}>
-        <Pin borderColor={highlighted ? '#34ebe1' : undefined} />
+        <Pin background={highlighted ? '#FBBC04' : undefined} />
       </AdvancedMarker>
       {infoWindowShown && (
         <InfoWindow anchor={marker} onClose={handleClose} style={{color:'black'}} headerContent={<h3 style={{color:'black'}}>{loc.name}</h3>}>

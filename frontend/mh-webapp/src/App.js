@@ -116,7 +116,7 @@ function App() {
     <div id="app" className="App">
       <header className="App-header">
         <h1>Subway Surfer (get it?)</h1>
-        <APIProvider apiKey='AIzaSyC3U77_nz6YmY_zGc8XhPdvVpaQ-22Ew7I' onLoad={() => console.log('Maps API loaded.')}>
+        <APIProvider apiKey='API_KEY_HERE' onLoad={() => console.log('Maps API loaded.')}>
           <Map
             style={{width: '100vw', height: '100vh'}}
             defaultCenter={{lat: 1.86865, lng: 107.43795}}

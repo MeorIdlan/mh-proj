@@ -2,6 +2,7 @@ import React, { useCallback, useState, useEffect } from 'react';
 import './App.css';
 import { APIProvider, AdvancedMarker, InfoWindow, Map, useAdvancedMarkerRef, useMap } from '@vis.gl/react-google-maps'
 import { Easing, Tween, update } from '@tweenjs/tween.js'
+import API_KEY from './api_key'
 
 function MarkerWithInfoWindow({loc}) {
   const map = useMap('SUBWAY_MAP');
@@ -116,7 +117,7 @@ function App() {
     <div id="app" className="App">
       <header className="App-header">
         <h1>Subway Surfer (get it?)</h1>
-        <APIProvider apiKey='API_KEY_HERE' onLoad={() => console.log('Maps API loaded.')}>
+        <APIProvider apiKey={API_KEY} onLoad={() => console.log('Maps API loaded.')}>
           <Map
             style={{width: '100vw', height: '100vh'}}
             defaultCenter={{lat: 1.86865, lng: 107.43795}}

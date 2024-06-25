@@ -58,18 +58,31 @@ const App: React.FC = () => {
   }, []);
 
   // filter locations on pressing Enter in query box
-  const handleSearchEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleSearchEnter = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       const query = (event.target as HTMLInputElement).value;
       if (query === '') {
         setFilteredLocations(locations);
       } else {
-        // manual filter, not using LLM/NLP
-        setFilteredLocations(locations.filter(loc => {
-          // search in name and address
-          return loc.name.toLowerCase().includes(query.toLowerCase()) ||
-            loc.address.toLowerCase().includes(query.toLowerCase());
-        }));
+        const newFilteredLocations: Location[] = [];
+        for (const loc of locations) {
+          const response = await fetch('http://localhost:5000/api/complex-query', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ query, location: loc })
+          });
+          const result = await response.json();
+          
+          if (loc.name.toLowerCase().includes(query.toLowerCase()) ||
+            loc.address.toLowerCase().includes(query.toLowerCase()) ||
+            result.include) {
+            newFilteredLocations.push(loc);
+          }
+        }
+        
+        setFilteredLocations(newFilteredLocations);
       }
     }
   };

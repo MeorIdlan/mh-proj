@@ -1,6 +1,7 @@
 from playwright.sync_api import sync_playwright, TimeoutError, expect
 import redis
 import json
+from location.locationObj import Location
 
 class cacheSetError(Exception):
     def __init__(self, code, message='Something went wrong when setting new cache data.') -> None:
@@ -39,20 +40,17 @@ class Scraper:
                 if (query is None):
                     all_locations = page.locator('.fp_listitem').all()
                     all_locations_list = [
-                        {
-                            'pos': {
-                                'lat': float(loc.get_attribute('data-latitude')),  # latitude
-                                'lng': float(loc.get_attribute('data-longitude')), # longitude
-                            },
-                            'name': loc.locator('.location_left h4').inner_text(),  # outlet name
-                            'address': loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(),    # outlet address
-                            'times': {
+                        Location(
+                            pos={'lat': float(loc.get_attribute('data-latitude')), 'lng': float(loc.get_attribute('data-longitude'))}, # latitude and longitude
+                            name=loc.locator('.location_left h4').inner_text(), # outlet name
+                            address=loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(), # outlet address
+                            times={
                                 'standard': loc.locator('.location_left .infoboxcontent p').nth(2).inner_text() if loc.locator('.location_left .infoboxcontent p').count()>2 else '',   # outlet standard operating hours
                                 'special': loc.locator('.location_left .infoboxcontent p').nth(3).inner_text() if loc.locator('.location_left .infoboxcontent p').count()>5 else '' # outlet special operating hours (if any)
                             },
-                            'google': loc.locator('.location_right .directionButton a').nth(0).get_attribute('href'), # google map link
-                            'waze': loc.locator('.location_right .directionButton a').nth(1).get_attribute('href') # waze link
-                        }
+                            google=loc.locator('.location_right .directionButton a').nth(0).get_attribute('href'), # google map link
+                            waze=loc.locator('.location_right .directionButton a').nth(1).get_attribute('href') # waze link
+                        )
                         for loc in all_locations
                     ]
                 else:
@@ -83,20 +81,17 @@ class Scraper:
                             except AssertionError:
                                 return False
                         all_locations_list = [
-                            {
-                                'pos': {
-                                    'lat': float(loc.get_attribute('data-latitude')),  # latitude
-                                    'lng': float(loc.get_attribute('data-longitude')), # longitude
-                                },
-                                'name': loc.locator('.location_left h4').inner_text(),  # outlet name
-                                'address': loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(),    # outlet address
-                                'times': {
+                            Location(
+                                pos={'lat': float(loc.get_attribute('data-latitude')), 'lng': float(loc.get_attribute('data-longitude'))}, # latitude and longitude
+                                name=loc.locator('.location_left h4').inner_text(), # outlet name
+                                address=loc.locator('.location_left .infoboxcontent p').nth(0).inner_text(), # outlet address
+                                times={
                                     'standard': loc.locator('.location_left .infoboxcontent p').nth(2).inner_text() if loc.locator('.location_left .infoboxcontent p').count()>2 else '',   # outlet standard operating hours
                                     'special': loc.locator('.location_left .infoboxcontent p').nth(3).inner_text() if loc.locator('.location_left .infoboxcontent p').count()>5 else '' # outlet special operating hours (if any)
                                 },
-                                'google': loc.locator('.location_right .directionButton a').nth(0).get_attribute('href'), # google map link
-                                'waze': loc.locator('.location_right .directionButton a').nth(1).get_attribute('href') # waze link
-                            }
+                                google=loc.locator('.location_right .directionButton a').nth(0).get_attribute('href'), # google map link
+                                waze=loc.locator('.location_right .directionButton a').nth(1).get_attribute('href') # waze link
+                            )
                             for loc in all_locations if checkCSS(loc)
                         ]
                     else:
@@ -106,9 +101,9 @@ class Scraper:
             
             # set cache
             if (query is None):
-                self.cache.set('all', json.dumps(all_locations_list), ex=self.ttl)
+                self.cache.set('all', json.dumps([loc.toJSON() for loc in all_locations_list]), ex=self.ttl)
             else:
-                self.cache.set(f"{query.replace(' ','').lower()}", json.dumps(all_locations_list), ex=self.ttl)
+                self.cache.set(f"{query.replace(' ','').lower()}", json.dumps([loc.toJSON() for loc in all_locations_list]), ex=self.ttl)
             return (1, '')
             
     def getLocations(self, query=None):

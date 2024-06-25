@@ -55,6 +55,13 @@ p.address {
   text-wrap: pretty;
 }
 
+p.times {
+  width: "50%";
+  color: black;
+  text-align: center;
+  text-wrap: pretty;
+}
+
 /* CSS for button to highlight stores nearby */
 .btn-highlight {
   appearance: none;

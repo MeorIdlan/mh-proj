@@ -37,6 +37,17 @@
   }
 }
 
+.infowindow {
+  color: black;
+  width: 80%;
+  margin: auto;
+}
+
+.infowindowheader {
+  color: black;
+  padding-left: 30px;
+}
+
 p.address {
   width: "50%";
   color: black;

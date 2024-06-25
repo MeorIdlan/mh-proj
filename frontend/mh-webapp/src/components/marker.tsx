@@ -14,6 +14,7 @@ export interface Location {
   pos: { lat: number; lng: number };
   google: string;
   waze: string;
+  times: {standard: string; special: string;};
 }
 
 // for display marker function props
@@ -108,8 +109,14 @@ function MarkerWithInfoWindow({loc,highlight,highlighted,setHighlightedLocations
       </AdvancedMarker>
       {infoWindowShown && (
         <InfoWindow anchor={marker} className='infowindow' onClose={handleClose} headerContent={<h3 className='infowindowheader'>{loc.name}</h3>}>
-          <p className='address'>{loc.address}</p>
-          <p></p>
+          <p className='address'>
+            {loc.address}
+          </p>
+          <br/>
+          <p className='times'>
+            {loc.times.standard}{loc.times.special.length > 0 ? <br/> + loc.times.special : undefined}
+          </p>
+          <br/>
           <p>
             <a href={loc.google} target='noreferrer noopener'>
               <FaLocationDot size={25}/>
@@ -118,6 +125,7 @@ function MarkerWithInfoWindow({loc,highlight,highlighted,setHighlightedLocations
               <FaWaze size={25}/>
             </a>
           </p>
+          <br/>
           <button className='btn-highlight' onClick={() => highlight(loc, 5, map)}>See other stores within 5 km</button>
         </InfoWindow>
       )}

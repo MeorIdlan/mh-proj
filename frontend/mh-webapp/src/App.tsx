@@ -21,6 +21,12 @@ const App: React.FC = () => {
   const [error, setError] = useState<Error | null>(null);
   const [apiLoaded, setApiLoaded] = useState(false);
 
+  // filtered locations based on search query
+  const [filteredLocations, setFilteredLocations] = useState<Location[]>([]);
+
+  // state for search query
+  const [searchQuery, setSearchQuery] = useState('');
+
   // retrieve all subway locations once
   useEffect(() => {
     const fetchLocations = async () => {
@@ -30,9 +36,18 @@ const App: React.FC = () => {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        // TODO check if locations key exists
-        setLocations(data.locations);
-        setLoading(false);
+        // error handling
+        if (data.locations && Array.isArray(data.locations) && typeof data.locations === 'object') {
+          setLocations(data.locations);
+          setFilteredLocations(data.locations);
+          setLoading(false);
+        } else {
+          if (data.locations) {
+            throw Error(`Error message: ${data.locations.message}\nError code: ${data.locations.code}`);
+          } else {
+            throw Error('Something went wrong during retrieving locations.')
+          }
+        }
       } catch (error) {
         setError(error as Error);
         setLoading(false);
@@ -41,6 +56,29 @@ const App: React.FC = () => {
 
     fetchLocations();
   }, []);
+
+  // filter locations on pressing Enter in query box
+  const handleSearchEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      const query = (event.target as HTMLInputElement).value;
+      if (query === '') {
+        setFilteredLocations(locations);
+      } else {
+        // manual filter, not using LLM/NLP
+        setFilteredLocations(locations.filter(loc => {
+          // search in name and address
+          return loc.name.toLowerCase().includes(query.toLowerCase()) ||
+            loc.address.toLowerCase().includes(query.toLowerCase());
+        }));
+      }
+    }
+  };
+
+  // for updating query box with text
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+  };
 
   // if loading, display this
   if (loading) {
@@ -70,6 +108,16 @@ const App: React.FC = () => {
     <div id="app" className="App">
       <header className="App-header">
         <h1>Subway Surfer (get it?)</h1>
+        <div style={{ paddingBottom: '15px', width: '50%' }}>
+          <input
+            type="text"
+            className="query"
+            placeholder="Search for a location"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onKeyDown={handleSearchEnter}
+          />
+        </div>
         <APIProvider apiKey={API_KEY} onLoad={() => {console.log('Maps API loaded.'); setApiLoaded(true)}}>
           {apiLoaded && (
             <Map
@@ -97,7 +145,7 @@ const App: React.FC = () => {
                 />
               )}
               {/* for each location, display marker */}
-              {locations.map((loc, index) => (
+              {filteredLocations.map((loc, index) => (
                 <MarkerWithInfoWindow
                   key={index}
                   loc={loc}

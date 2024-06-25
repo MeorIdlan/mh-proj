@@ -1,6 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { AdvancedMarker, InfoWindow, Pin, useAdvancedMarkerRef, useMap } from '@vis.gl/react-google-maps'
 import { Easing, Tween, update } from '@tweenjs/tween.js'
+import { FaLocationDot, FaWaze } from 'react-icons/fa6'
+import '../App.css';
 
 // initial center upon loading the page
 export const INIT_CENTER = {lat: 1.86865, lng: 107.43795};
@@ -10,6 +12,8 @@ export interface Location {
   name: string;
   address: string;
   pos: { lat: number; lng: number };
+  google: string;
+  waze: string;
 }
 
 // for display marker function props
@@ -104,8 +108,17 @@ function MarkerWithInfoWindow({loc,highlight,highlighted,setHighlightedLocations
       </AdvancedMarker>
       {infoWindowShown && (
         <InfoWindow anchor={marker} onClose={handleClose} style={{color:'black'}} headerContent={<h3 style={{color:'black'}}>{loc.name}</h3>}>
-          <p>{loc.address}</p>
-          <button onClick={() => highlight(loc, 5, map)}>See other stores within 5 km</button>
+          <p className='address'>{loc.address}</p>
+          <p></p>
+          <p>
+            <a href={loc.google} target='noreferrer noopener'>
+              <FaLocationDot size={25}/>
+            </a>
+            <a href={loc.waze} target='noreferrer noopener'>
+              <FaWaze size={25}/>
+            </a>
+          </p>
+          <button className='btn-highlight' onClick={() => highlight(loc, 5, map)}>See other stores within 5 km</button>
         </InfoWindow>
       )}
     </>

@@ -26,7 +26,7 @@ class Scraper:
     def scrape_subway_site(self, query=None):
         with sync_playwright() as p:
             # start browser and create new page
-            browser = p.chromium.launch(headless=False)
+            browser = p.chromium.launch(headless=True)
             page = browser.new_page()
             
             # go to url
@@ -129,10 +129,3 @@ class Scraper:
                 return json.loads(self.cache.get('all'))
             else:
                 return json.loads(self.cache.get(f"{query.replace(' ','').lower()}"))
-    
-if __name__ == '__main__':
-    scraper = Scraper('dev')
-    try:
-        print(scraper.getLocations('penang'))
-    except TimeoutError:
-        pass

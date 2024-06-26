@@ -64,25 +64,22 @@ const App: React.FC = () => {
       if (query === '') {
         setFilteredLocations(locations);
       } else {
-        const newFilteredLocations: Location[] = [];
-        for (const loc of locations) {
-          const response = await fetch('http://localhost:5000/api/complex-query', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ query, location: loc })
-          });
-          const result = await response.json();
-          
-          if (loc.name.toLowerCase().includes(query.toLowerCase()) ||
-            loc.address.toLowerCase().includes(query.toLowerCase()) ||
-            result.include) {
-            newFilteredLocations.push(loc);
-          }
-        }
         
-        setFilteredLocations(newFilteredLocations);
+        const response = await fetch('http://localhost:5000/api/complex-query', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ query, locations: locations })
+        });
+        const result = await response.json();
+        if (result.locations.length > 0) {
+          setFilteredLocations(result.locations);
+        } else {
+          setFilteredLocations(locations.filter(
+            loc => loc.name.toLowerCase().includes(query.toLowerCase()) || loc.address.toLowerCase().includes(query.toLowerCase())
+          ))
+        }
       }
     }
   };

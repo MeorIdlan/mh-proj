@@ -32,7 +32,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('http://localhost:5000/dev-api/subway-locations');
+        const response = await fetch('http://localhost:5000/api/subway-locations');
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -74,9 +74,9 @@ const App: React.FC = () => {
           body: JSON.stringify({ query, locations: locations, allPostcodes })
         });
         const result = await response.json();
-        if (result.locations.length > 0) {
+        if (result.locations.length > 0) { 
           setFilteredLocations(result.locations);
-        } else {
+        } else { // regular search
           setFilteredLocations(locations.filter(
             loc => loc.name.toLowerCase().includes(query.toLowerCase()) || loc.address.toLowerCase().includes(query.toLowerCase())
           ))
@@ -139,7 +139,6 @@ const App: React.FC = () => {
               disableDefaultUI={true}
               mapId={'SUBWAY_MAP'}
               id={'SUBWAY_MAP'}
-              onCameraChanged={(ev) => console.log('camera changed:', ev.detail.center, 'zoom:', ev.detail.zoom)}
             >
               {/* if circle has a radius, display it */}
               {radius>0 && (

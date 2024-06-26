@@ -114,7 +114,13 @@ function MarkerWithInfoWindow({loc,highlight,highlighted,setHighlightedLocations
           </p>
           <br/>
           <p className='times'>
-            {loc.times.standard}{loc.times.special.length > 0 ? <br/> + loc.times.special : undefined}
+            {loc.times.standard}
+            {loc.times.special.length > 0 && (
+              <>
+                <br/>
+                {loc.times.special}
+              </>
+            )}
           </p>
           <br/>
           <p>

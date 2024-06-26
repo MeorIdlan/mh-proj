@@ -109,7 +109,7 @@ You must have these before continuing.
    ```
 
 2. Frontend installation
-    1. Open terminal and cd to `/frontend/mh-webapp`
+    1. Open terminal and navigate to `/frontend/mh-webapp`
 
     2. Install NPM packages
 
@@ -124,7 +124,7 @@ You must have these before continuing.
         ```
 
 3. Backend installation
-    1. cd to `/backend`
+    1. Navigate to `/backend`
 
     2. Create a virtual environment. [How to create venv](https://realpython.com/python-virtual-environments-a-primer/)
 
@@ -193,7 +193,7 @@ You must have these before continuing.
 
 4. Once you have the frontend and backend setup, you can start the webapp.
 
-    1. cd to `/backend`
+    1. Navigate to `/backend`
 
     2. Activate venv (if you haven't already)
 
@@ -203,7 +203,7 @@ You must have these before continuing.
         python app.py
         ```
 
-    4. cd to `/frontend/mh-webapp`
+    4. Navigate to `/frontend/mh-webapp`
 
     5. Start the node development server
 

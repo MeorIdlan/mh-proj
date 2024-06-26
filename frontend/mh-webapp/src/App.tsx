@@ -4,6 +4,7 @@ import { APIProvider, Map } from '@vis.gl/react-google-maps'
 import { Circle } from './components/circle';
 import { API_KEY } from './api_key'
 import MarkerWithInfoWindow, { Location, INIT_CENTER, seeOtherStoresWithinRadius } from './components/marker'
+import { allPostcodes } from 'malaysia-postcodes';
 
 const App: React.FC = () => {
   // locations to be displayed on map
@@ -70,7 +71,7 @@ const App: React.FC = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ query, locations: locations })
+          body: JSON.stringify({ query, locations: locations, allPostcodes })
         });
         const result = await response.json();
         if (result.locations.length > 0) {

@@ -24,8 +24,9 @@ def complex_query():
     data = request.json
     query = data['query'].lower()
     locations = [Location.fromDict(loc) for loc in data['locations']]
+    postcodes = data['allPostcodes']
     
-    filteredLocations = parse_query(query=query, locations=locations)
+    filteredLocations = parse_query(query=query, locations=locations, postcodes=postcodes)
     
     return jsonify({'locations': filteredLocations})
 

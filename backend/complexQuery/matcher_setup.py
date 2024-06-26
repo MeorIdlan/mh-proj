@@ -1,6 +1,6 @@
 from spacy.tokens import Doc
 
-Doc.set_extension('operational', default=False)
+Doc.set_extension('operationalq', default=False)
 Doc.set_extension('earlylate', default=False)
 Doc.set_extension('open', default=False)
 Doc.set_extension('early', default=False)
@@ -13,8 +13,10 @@ Doc.set_extension('day', default='')
 Doc.set_extension('longshort', default=False)
 Doc.set_extension('long', default=False)
 
-def set_operational_true(matcher, doc, i, matches):
-    doc._.operational = True
+Doc.set_extension('locationq', default=True)
+
+def set_operationalq_true(matcher, doc, i, matches):
+    doc._.operationalq = True
     
 def set_earlylate_true(matcher, doc, i, matches):
     doc._.earlylate = True
@@ -53,22 +55,35 @@ def set_longshort_true(matcher, doc, i, matches):
     match_id, start, end = matches[i]
     if doc[start].text.lower() == 'longest':
         doc._.long = True
+        
+def set_locationq_true(matcher, doc, i, matches):
+    doc._.locationq = True
     
 # add patterns to match here
 patterns = {
-    'pattern_operational_closesopens': {
+    'pattern_operational': {
         'pattern': [
             [
                 {
-                    "LEMMA": {"IN": ["close", "open", "store"]},
+                    "LEMMA": {"IN": ["close", "open"]},
                     "DEP": "ROOT"
                 }
-            ]
-        ],
-        'onMatch': set_operational_true
-    },
-    'pattern_operational_areopen': {
-        'pattern': [
+            ],
+            [
+                {
+                    "LEMMA": "store",
+                    "DEP": "ROOT"
+                },
+                {
+                    "LOWER": "that",
+                    "POS": "PRON",
+                    "DEP": "nsubj"
+                },
+                {
+                    "LEMMA": {"IN": ["close","open"]},
+                    "DEP": "relcl"
+                }
+            ],
             [
                 {
                     "LEMMA": "be",
@@ -78,12 +93,7 @@ patterns = {
                     "LEMMA": "open",
                     "DEP": "acomp"
                 }
-            ]
-        ],
-        'onMatch': set_operational_true
-    },
-    'pattern_operational_list': {
-        'pattern': [
+            ],
             [
                 {
                     "LOWER": "list",
@@ -97,12 +107,7 @@ patterns = {
                     "LEMMA": "store",
                     "DEP": "dobj"
                 }
-            ]
-        ],
-        'onMatch': set_operational_true
-    },
-    'pattern_operational_operatinghour': {
-        'pattern': [
+            ],
             [
                 {
                     "LOWER": "operating",
@@ -114,7 +119,7 @@ patterns = {
                 }
             ]
         ],
-        'onMatch': set_operational_true
+        'onMatch': set_operationalq_true
     },
     'pattern_earlylate': {
         'pattern': [
@@ -305,4 +310,92 @@ patterns = {
         ],
         'onMatch': set_longshort_true
     },
+    'pattern_location': {
+        'pattern': [
+            [
+                {
+                    "LOWER": "located",
+                    "DEP": "ROOT"
+                },
+                {
+                    "LOWER": {"IN": ["in", "at"]},
+                    "DEP": "prep"
+                },
+                {
+                    "POS": "PROPN"
+                }
+            ],
+            [
+                {
+                    "LOWER": "located",
+                    "DEP": "ROOT"
+                },
+                {
+                    "LOWER": {"IN": ["in", "at"]},
+                    "DEP": "prep"
+                },
+                {
+                    "POS": "NOUN",
+                    "DEP": "pobj"
+                }
+            ],
+            [
+                {
+                    "LEMMA": "be",
+                    "DEP": "ROOT"
+                },
+                {
+                    "LOWER": {"IN": ["in", "at"]},
+                    "DEP": "prep"
+                },
+                {
+                    "POS": "PROPN"
+                }
+            ],
+            [
+                {
+                    "LEMMA": "be",
+                    "DEP": "ROOT"
+                },
+                {
+                    "LOWER": {"IN": ["in", "at"]},
+                    "DEP": "prep"
+                },
+                {
+                    "POS": "NOUN",
+                    "DEP": "pobj"
+                }
+            ],
+            [
+                {
+                    "LOWER": "located",
+                    "DEP": "relcl",
+                    "POS": "VERB"
+                },
+                {
+                    "LOWER": {"IN": ["in", "at"]},
+                    "DEP": "prep"
+                },
+                {
+                    "POS": "PROPN"
+                }
+            ],
+            [
+                {
+                    "LOWER": "located",
+                    "DEP": "relcl",
+                    "POS": "VERB"
+                },
+                {
+                    "LOWER": {"IN": ["in", "at"]},
+                    "DEP": "prep"
+                },
+                {
+                    "POS": "NOUN",
+                    "DEP": "pobj"
+                }
+            ]
+        ],
+        "onMatch": set_locationq_true
+    }
 }

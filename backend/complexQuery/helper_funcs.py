@@ -209,3 +209,29 @@ def findOpenStoresOnDay(locations: list[Location], day: str, open: bool):
                     break
 
     return filteredLocations
+
+def findStoresByStateCityPostcode(locations: list[Location], query: str, postcodes: list):
+    query_lower = query.lower()
+    locations_in_query = set()
+
+    for state in postcodes:
+        state_name = state['name'].lower() 
+        if state_name in query_lower: # find by state
+            locations_in_query.add(state_name)
+            
+        for city in state['city']:
+            city_name = city['name'].lower()
+            if city_name in query_lower: # find by city
+                locations_in_query.add(city_name)
+                
+            city_postcodes = city['postcode']
+            for pc in city_postcodes:
+                if pc in query_lower: # find by postcode
+                    locations_in_query.add(pc)
+                
+    filteredLocations = [
+        loc.toJSON() for loc in locations 
+        if any(loc_q in loc.getAddress().lower() for loc_q in locations_in_query)
+    ]
+    
+    return filteredLocations

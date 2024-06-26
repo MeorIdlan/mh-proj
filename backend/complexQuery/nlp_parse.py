@@ -35,7 +35,7 @@ nlp = spacy.load('en_core_web_sm')
 #     "Which XYZ store has the longest operating hours?",
 # ]
 
-def parse_query(query, locations):
+def parse_query(query, locations, postcodes):
     doc = nlp(query)
     matcher = Matcher(nlp.vocab)
     
@@ -48,8 +48,9 @@ def parse_query(query, locations):
             newQuery = query + '.'
             doc = nlp(newQuery)
     
-    for token in doc:
-        print(f'Token: {token.text}, POS: {token.pos_}, Dependency: {token.dep_}, Head: {token.head.text}, Lemma: {token.lemma_}')
+    # print([(ent.text, ent.label_) for ent in doc.ents])
+    # for token in doc:
+    #     print(f'Token: {token.text}, POS: {token.pos_}, Dependency: {token.dep_}, Head: {token.head.text}, Lemma: {token.lemma_}')
     
     # add patterns to matcher and start matching
     for pattern_name in patterns.keys():
@@ -57,7 +58,7 @@ def parse_query(query, locations):
     matches = matcher(doc)
     
     # go into specific functions and return
-    if doc._.operational:
+    if doc._.operationalq:
         if doc._.earlylate:
             return findEarliestOrLatestStore(locations=locations, open=doc._.open, early=doc._.early)
         elif doc._.atspecifictime:
@@ -71,6 +72,8 @@ def parse_query(query, locations):
         else:
             print('operational no pass')
             return []
+    elif doc._.locationq:
+        return findStoresByStateCityPostcode(locations=locations, query=query, postcodes=postcodes)
     else:
         print('no pass')
         return []
